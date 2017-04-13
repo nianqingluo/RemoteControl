@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.jiadu.dudu.MainActivity"
+
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="底盘连接方法"
+        android:textSize="17sp"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:background="#3e5f6e"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@mipmap/bg02"
+        >
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+
+            <Button
+                android:id="@+id/bt_bluetooth"
+                android:layout_width="159dp"
+                android:layout_height="190dp"
+                android:padding="0dp"
+                android:background="@drawable/selector_bluetooth"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="4.5dp"
+                android:layout_marginBottom="79dp"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <Button
+                android:id="@+id/bt_wifi"
+                android:padding="0dp"
+                android:layout_width="159dp"
+                android:layout_height="190dp"
+                android:background="@drawable/selector_wifi"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="4.5dp"
+                android:layout_marginBottom="79dp"
+                />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

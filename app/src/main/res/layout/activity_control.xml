@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@mipmap/bg01"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        >
+        <TextView
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/dingbu"
+            android:textSize="17sp"
+            android:textColor="#ffffff"
+            android:text="HMSoft"
+            />
+        <Button
+            android:id="@+id/bt_control_back"
+            android:layout_width="11dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:padding="0dp"
+            android:background="@drawable/selector_back_top"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:clickable="true"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/ll_set"
+            android:visibility="gone"
+
+            >
+            <Button
+                android:id="@+id/bt_control_paramset"
+                android:text="参数设置"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:layout_width="158dp"
+                android:layout_height="40dp"
+                android:background="@drawable/selector_connect_confirm"
+                android:layout_marginRight="8dp"
+                />
+
+            <Button
+                android:id="@+id/bt_control_PIDset"
+                android:text="PID设置"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:layout_width="158dp"
+                android:layout_height="40dp"
+                android:background="@drawable/selector_connect_confirm"
+                android:layout_marginLeft="8dp"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_control_linearspeed"
+            android:layout_below="@id/ll_set"
+            android:layout_marginTop="21dp"
+            android:layout_marginLeft="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="最大线速度 0.2m/s"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            />
+
+        <SeekBar
+            android:progressDrawable="@drawable/selector_seekbar"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="5.5dp"
+            android:minHeight="5.5dp"
+            android:id="@+id/sb_control_linearspeed"
+            android:layout_below="@id/tv_control_linearspeed"
+            android:layout_alignLeft="@id/tv_control_linearspeed"
+            android:max="100"
+            android:progress="100"
+            android:layout_marginTop="19dp"
+            android:thumb="@drawable/circle"
+            />
+
+        <TextView
+            android:id="@+id/tv_control_anglespeed"
+            android:layout_below="@id/sb_control_linearspeed"
+            android:layout_marginTop="33dp"
+            android:layout_alignLeft="@id/tv_control_linearspeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="最大角速度 6 - 9 (°/s)"
+            android:textColor="#ffffff"
+            android:textSize="15sp"
+            />
+
+        <SeekBar
+            android:progressDrawable="@drawable/selector_seekbar"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="5.5dp"
+            android:minHeight="5.5dp"
+            android:id="@+id/sb_control_anglespeed"
+            android:layout_below="@id/tv_control_anglespeed"
+            android:layout_alignLeft="@id/tv_control_anglespeed"
+            android:max="100"
+            android:layout_marginTop="19dp"
+            android:thumb="@drawable/circle"
+            android:progress="100"
+            />
+
+        <com.jiadu.view.MyImageView
+            android:id="@+id/myiv_control_control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/fangxiang01"
+            android:layout_below="@id/sb_control_anglespeed"
+            android:layout_marginTop="31dp"
+            android:layout_centerHorizontal="true"
+            />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>
