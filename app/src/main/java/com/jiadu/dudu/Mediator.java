@@ -1,6 +1,7 @@
 package com.jiadu.dudu;
 
 import com.eaibot.library.ros.DashgoPublisher;
+import com.jiadu.util.LogUtil;
 import com.jiadu.view.MyImageView;
 
 /**
@@ -12,6 +13,7 @@ public class Mediator {
 
     private final ControlActivity mActivity;
     private final MyImageView mMiv;
+
     private final DashgoPublisher mDashgoPublisher;
 
     public Mediator(ControlActivity activity, MyImageView miv) {
@@ -20,6 +22,7 @@ public class Mediator {
         mDashgoPublisher = mActivity.getDashgoPublisher();
 
         mMiv = miv;
+
         mMiv.setListener(new MyPublishListener());
     }
 
@@ -27,34 +30,44 @@ public class Mediator {
         @Override
         public void publishToRos() {
 
-            switch (mMiv.getLastDirection()){
-                case 1://前进
+            try {
+                switch (mMiv.getLastDirection()){
+                    case 1://前进
 
-                    mDashgoPublisher.publishVelocity(mMiv.getSpeedRatio(),0,0);
+                        mDashgoPublisher.publishVelocity(mMiv.getSpeedRatio(),0,0);
 
-                break;
-                case 2://右转
+                    break;
+                    case 2://右转
 
-                    mDashgoPublisher.publishVelocity(0,0,mMiv.getSpeedRatio());
+                        mDashgoPublisher.publishVelocity(0,0,mMiv.getSpeedRatio());
 
-                break;
-                case 3://后退
-                    mDashgoPublisher.publishVelocity(-mMiv.getSpeedRatio(),0,0);
+                    break;
+                    case 3://后退
+                        mDashgoPublisher.publishVelocity(-mMiv.getSpeedRatio(),0,0);
 
-                break;
-                case 4://左转
-                    mDashgoPublisher.publishVelocity(0,0,-mMiv.getSpeedRatio());
+                    break;
+                    case 4://左转
+                        mDashgoPublisher.publishVelocity(0,0,-mMiv.getSpeedRatio());
 
-                break;
+                    break;
 
-                default:
-                break;
+                    default:
+                    break;
+                }
+            } catch (Exception e) {
+
+                LogUtil.debugLog("fuck：publishToRos--"+e.getMessage());
             }
         }
 
         @Override
         public void stopPublish() {
-            mDashgoPublisher.publishVelocity(0,0,0);
+
+            try {
+                mDashgoPublisher.publishVelocity(0,0,0);
+            } catch (Exception e) {
+                LogUtil.debugLog("fuck：stopPublish--"+e.getMessage());
+            }
         }
     }
 }

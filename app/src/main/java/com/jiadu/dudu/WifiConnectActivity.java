@@ -97,9 +97,12 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
             break;
             case R.id.bt_wificonnect_confirm:
 
-//                Intent intent = new Intent(WifiConnectActivity.this, ControlActivity.class);
-//                startActivity(intent);
-//                finish();
+/*
+                Intent intent = new Intent(WifiConnectActivity.this, ControlActivity.class);
+                startActivity(intent);
+                finish();
+*/
+
                 showDialog(1);
 
                 mEt_ip.setEnabled(false);

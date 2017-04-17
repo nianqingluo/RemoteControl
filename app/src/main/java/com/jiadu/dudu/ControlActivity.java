@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.eaibot.library.constants.BroadcastConstant;
 import com.eaibot.library.ros.DashgoPublisher;
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
-import com.jiadu.util.LogUtil;
 import com.jiadu.util.SharePreferenceUtil;
 import com.jiadu.view.MyImageView;
 
@@ -22,11 +21,14 @@ import org.ros.address.InetAddressFactory;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 
+import java.text.DecimalFormat;
+
 /**
  * Created by Administrator on 2017/4/10.
  */
 public class ControlActivity extends RosAppActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     public static final String KEY_MAXLINEARSPEED = "maxlinearspeed";
+    public static final String KEY_MAXANGLESPEED = "maxanglespeed";
     private Button mBt_paramset;
     private Button mBt_pidset;
     private TextView mTv_linerspeed;
@@ -35,11 +37,13 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     private SeekBar mSb_anglespeed;
     private Button mBt_back;
 
-    private float mMaxLinearSpeed = 0f;
-    private float maxAngleSpeed = 0f;
+    private float mMaxLinearSpeed = 0.2f;
+    private float mMaxAngleSpeed = 12.f;
 
     private Mediator mMediator = null;
 
+    private DecimalFormat mDecimalFormat=new DecimalFormat(".00");
+    private DecimalFormat mDecimalFormat2=new DecimalFormat(".0");
 
     private BroadcastReceiver rosServiceBroadcastRceiver = new BroadcastReceiver() {
         @Override
@@ -54,11 +58,12 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
     private NodeConfiguration nodeConfiguration;
 
+    private DashgoPublisher dashgoPublisher;
+
     public DashgoPublisher getDashgoPublisher() {
         return dashgoPublisher;
     }
 
-    private DashgoPublisher dashgoPublisher;
     private MyImageView mMyiv_control;
 
     public ControlActivity() {
@@ -72,11 +77,10 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         setMainWindowResource(R.layout.activity_control);
         super.onCreate(savedInstanceState);
 
-        LogUtil.debugLog("onCreate方法执行了..");
-
         initView();
 
         initData();
+
     }
 
 
@@ -84,11 +88,15 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     protected void init(NodeMainExecutor nodeMainExecutor) {
         super.init(nodeMainExecutor);
 
-        LogUtil.debugLog("init方法执行了");
 
         nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
         dashgoPublisher = new DashgoPublisher();
         nodeMainExecutor.execute(dashgoPublisher, nodeConfiguration.setNodeName("eaibot/dashgo_demo"));
+
+        dashgoPublisher.setMaxLinearSpeed(mMaxLinearSpeed);
+
+        dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.0f);
+
         mMediator = new Mediator(this,mMyiv_control);
     }
 
@@ -97,10 +105,6 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         mBt_paramset.setOnClickListener(this);
 
         mBt_pidset.setOnClickListener(this);
-
-        mSb_linearspeed.setOnSeekBarChangeListener(this);
-
-        mSb_anglespeed.setOnSeekBarChangeListener(this);
 
         mBt_back.setOnClickListener(this);
 
@@ -114,6 +118,30 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+
+
+        String maxanglespeed = SharePreferenceUtil.getSring(this, KEY_MAXANGLESPEED);
+
+        if (!TextUtils.isEmpty(maxanglespeed)){
+
+            try {
+
+                mMaxAngleSpeed = Float.parseFloat(maxanglespeed);
+
+                float c = (mMaxAngleSpeed-9.0f)/6.0f*100;
+
+                mSb_anglespeed.setProgress((int) c);
+
+                mTv_anglespeed.setText("最大角速度 "+ mMaxAngleSpeed +"°/s");
+
+            }catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        mSb_linearspeed.setOnSeekBarChangeListener(this);
+
+        mSb_anglespeed.setOnSeekBarChangeListener(this);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BroadcastConstant.ROS_CLOSE_FINISHED);
@@ -178,11 +206,13 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
             case R.id.sb_control_linearspeed:
                 mMaxLinearSpeed = 0.1f+progress*0.1f/100;
 
-                mTv_linerspeed.setText("最大线速度 "+mMaxLinearSpeed+"m/s");
+                mTv_linerspeed.setText("最大线速度 "+Float.parseFloat(mDecimalFormat.format(mMaxLinearSpeed))+"m/s");
 
             break;
             case R.id.sb_control_anglespeed:
+                mMaxAngleSpeed = 9 + progress*6.0f/100;
 
+                mTv_anglespeed.setText("最大角速度 "+ mDecimalFormat2.format(mMaxAngleSpeed)+"°/s");
             break;
 
             default:
@@ -198,22 +228,34 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        switch (seekBar.getId()){
-            case R.id.sb_control_linearspeed:
+        switch (seekBar.getId()) {
+            case R.id.sb_control_linearspeed:{
 
                 int progress = seekBar.getProgress();
 
-                mMaxLinearSpeed = 0.1f+progress*0.1f/100;
+                mMaxLinearSpeed = 0.1f + progress * 0.1f / 100;
 
-                mTv_linerspeed.setText("最大线速度 "+mMaxLinearSpeed+"m/s");
+                mTv_linerspeed.setText("最大线速度 " + Float.parseFloat(mDecimalFormat.format(mMaxLinearSpeed)) + "m/s");
+
+                SharePreferenceUtil.putString(this, KEY_MAXLINEARSPEED, mDecimalFormat.format(mMaxLinearSpeed));
 
                 dashgoPublisher.setMaxLinearSpeed(mMaxLinearSpeed);
 
-                SharePreferenceUtil.putString(this,KEY_MAXLINEARSPEED,0.1f+progress*0.1f/100+"");
-
+            }
                 break;
-            case R.id.sb_control_anglespeed:
+            case R.id.sb_control_anglespeed:{
 
+                int progress = seekBar.getProgress();
+
+                mMaxAngleSpeed = 9.0f+progress*6.0f/100;
+
+                mTv_anglespeed.setText("最大角速度 "+Float.parseFloat(mDecimalFormat2.format(mMaxAngleSpeed))+"°/s");
+
+                SharePreferenceUtil.putString(this,KEY_MAXANGLESPEED,mDecimalFormat2.format(mMaxAngleSpeed));
+
+                dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.f);
+
+            }
             break;
             default:
             break;

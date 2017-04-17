@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import com.jiadu.dudu.R;
+import com.jiadu.util.LogUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -171,6 +172,8 @@ public class MyImageView extends ImageView {
 
                         if (mListener != null){
 
+                            LogUtil.debugLog("mListener:"+mListener);
+
                             mListener.publishToRos();
                         }
                     }
@@ -187,7 +190,9 @@ public class MyImageView extends ImageView {
             break;
             case MotionEvent.ACTION_UP:{
                 mTimer.cancel();
-                mListener.stopPublish();
+                if (mListener != null) {
+                    mListener.stopPublish();
+                }
                 mSpeedRatio=0.f;
                 setImageResource(R.mipmap.fangxiang01);
                 mLastDirection=0;
@@ -197,7 +202,9 @@ public class MyImageView extends ImageView {
             break;
             case MotionEvent.ACTION_CANCEL:{
                 mTimer.cancel();
-                mListener.stopPublish();
+                if (mListener != null) {
+                    mListener.stopPublish();
+                }
                 mSpeedRatio=0.f;
                 setImageResource(R.mipmap.fangxiang01);
                 mLastDirection=0;
