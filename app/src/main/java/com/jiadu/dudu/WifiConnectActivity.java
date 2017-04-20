@@ -118,7 +118,6 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
 
                         Intent intent = new Intent(WifiConnectActivity.this, ControlActivity.class);
                         startActivity(intent);
-                        finish();
                     }
 
                     @Override

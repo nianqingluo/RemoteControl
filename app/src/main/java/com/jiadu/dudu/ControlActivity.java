@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.eaibot.library.constants.BroadcastConstant;
 import com.eaibot.library.ros.DashgoPublisher;
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
+import com.jiadu.util.LogUtil;
 import com.jiadu.util.SharePreferenceUtil;
 import com.jiadu.view.MyImageView;
 
@@ -88,6 +89,9 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     protected void init(NodeMainExecutor nodeMainExecutor) {
         super.init(nodeMainExecutor);
 
+        String name = Thread.currentThread().getName();
+
+        LogUtil.debugLog("localName:"+name);
 
         nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
         dashgoPublisher = new DashgoPublisher();
