@@ -53,7 +53,5 @@ public class ParamSetActivity extends AppCompatActivity implements View.OnClickL
             default:
             break;
         }
-
-
     }
 }
