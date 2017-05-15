@@ -12,10 +12,8 @@ public class LogUtil {
 
     public static void debugLog(String content){
         if(isDebug){
-
             Log.d(TAG,content);
         }
     }
-
 }
 

@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import com.jiadu.dudu.R;
-import com.jiadu.util.LogUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,7 +56,11 @@ public class MyImageView extends ImageView {
 
     private final int INTERVAL = 300; //publish的时间间隔 单位：毫秒
 
+    private int mInterval = INTERVAL;
+
     private PublishListener mListener = null;
+
+
 
     public void setListener(PublishListener listener) {
         this.mListener = listener;
@@ -172,8 +175,6 @@ public class MyImageView extends ImageView {
 
                         if (mListener != null){
 
-                            LogUtil.debugLog("mListener:"+mListener);
-
                             mListener.publishToRos();
                         }
                     }
@@ -203,6 +204,7 @@ public class MyImageView extends ImageView {
             case MotionEvent.ACTION_CANCEL:{
                 mTimer.cancel();
                 if (mListener != null) {
+
                     mListener.stopPublish();
                 }
                 mSpeedRatio=0.f;
@@ -212,7 +214,6 @@ public class MyImageView extends ImageView {
                 reInitXY();
             }
             break;
-
 
             default:
             break;
@@ -313,6 +314,16 @@ public class MyImageView extends ImageView {
         }
 
         return 0;
+    }
+
+    /**
+     * @param interval 每次发送消息的时间间隔
+     */
+    public void setInterval(int interval) {
+        if (interval<=300){
+            mInterval = 300;
+        }
+        mInterval = interval;
     }
 
     public interface PublishListener{

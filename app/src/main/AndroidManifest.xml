@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.jiadu.dudu"
           xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -9,8 +10,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,21 +26,21 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="com.eaibot.eaidebug.activity.RosUrlChooserActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
 
         <activity android:name=".WifiConnectActivity"></activity>
         <activity android:name=".ControlActivity"></activity>
-
+        <activity android:name=".bluetooth.BluetoothConnectActivity"></activity>
+        <activity android:name=".bluetooth.BluetoothControlActivity"></activity>
         <activity android:name=".PIDSetActivity"></activity>
         <activity android:name=".ParamSetActivity"></activity>
+        <service android:name=".bluetooth.BluetoothLeService"></service>
         <service android:name="org.ros.android.NodeMainExecutorService" >
             <intent-filter>
                 <action android:name="org.ros.org.ros.android.NodeMainExecutorService" />

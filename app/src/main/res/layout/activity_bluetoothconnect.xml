@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@mipmap/bg01"
+            >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <TextView
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/dingbu"
+            android:textSize="17sp"
+            android:textColor="#ffffff"
+            android:text="ROS Master 连接"
+            />
+        <ImageView
+            android:id="@+id/iv_bluetoothconnect_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="0dp"
+            android:background="@drawable/selector_back_top"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:clickable="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:textColor="#ffffff"
+            android:text="STOP"
+            android:textSize="17sp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_bluetooth_scan"
+            android:clickable="true"
+            />
+
+        <ProgressBar
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/pb_bluetoothconnect_scan"
+            android:layout_toLeftOf="@id/tv_bluetooth_scan"
+            android:layout_marginRight="5dp"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lv_bluetooth"
+        android:divider="#c9c9c9"
+        android:dividerHeight="2dp"
+        >
+    </ListView>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="right"/>
+</LinearLayout>

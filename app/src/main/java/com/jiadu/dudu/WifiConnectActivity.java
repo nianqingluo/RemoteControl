@@ -117,7 +117,10 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
                         dismissDialog(1);
 
                         Intent intent = new Intent(WifiConnectActivity.this, ControlActivity.class);
+
                         startActivity(intent);
+
+                        finish();
                     }
 
                     @Override

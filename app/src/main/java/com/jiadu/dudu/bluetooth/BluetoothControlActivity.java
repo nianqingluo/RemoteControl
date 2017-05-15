@@ -1,12 +1,15 @@
-package com.jiadu.dudu;
+package com.jiadu.dudu.bluetooth;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -14,127 +17,78 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.eaibot.library.constants.BroadcastConstant;
-import com.eaibot.library.ros.DashgoPublisher;
-import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
-import com.jiadu.util.LogUtil;
+import com.jiadu.dudu.R;
 import com.jiadu.util.SharePreferenceUtil;
 import com.jiadu.view.MyImageView;
-
-import org.ros.address.InetAddressFactory;
-import org.ros.node.NodeConfiguration;
-import org.ros.node.NodeMainExecutor;
 
 import java.text.DecimalFormat;
 
 /**
- * Created by Administrator on 2017/4/10.
+ * Created by Administrator on 2017/5/12.
  */
-public class ControlActivity extends RosAppActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
-    public static final String KEY_MAXLINEARSPEED = "maxlinearspeed";
-    public static final String KEY_MAXANGLESPEED = "maxanglespeed";
-    private Button mBt_paramset;
+public class BluetoothControlActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, MyImageView.PublishListener {
+
     private Button mBt_pidset;
+    private Button mBt_paramset;
     private TextView mTv_linerspeed;
     private TextView mTv_anglespeed;
     private SeekBar mSb_linearspeed;
     private SeekBar mSb_anglespeed;
-    private ImageView mBt_back;
+    private ImageView mIv_back;
+    private MyImageView mMyiv_control;
+
+    private static final String KEY_MAXLINEARSPEED = "maxlinearspeed";
+    private static final String KEY_MAXANGLESPEED = "maxanglespeed";
 
     private float mMaxLinearSpeed = 0.2f;
     private float mMaxAngleSpeed = 12.f;
 
-    private Mediator mMediator = null;
-
     private DecimalFormat mDecimalFormat=new DecimalFormat(".00");
     private DecimalFormat mDecimalFormat2=new DecimalFormat(".0");
+    private MyReceive mReceiver;
 
-    private BroadcastReceiver rosServiceBroadcastRceiver = new BroadcastReceiver() {
+    private BluetoothLeService mBluetoothLeService = null;
+
+    private ServiceConnection mConn = new ServiceConnection() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(BroadcastConstant.ROS_CLOSE_FINISHED)){
-                if(intent.getBooleanExtra("rosFinished" , false)){
-                    finish();
-                }
-            }
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBluetoothLeService = ((BluetoothLeService.LocalService)service).getLocalService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBluetoothLeService =null;
         }
     };
 
-    private NodeConfiguration nodeConfiguration;
-
-    private DashgoPublisher dashgoPublisher;
-
-    public DashgoPublisher getDashgoPublisher() {
-        return dashgoPublisher;
-    }
-
-    private MyImageView mMyiv_control;
-
-    public ControlActivity() {
-        super("Dashgo Control", "Dashgo Control");
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        setDefaultMasterName("eaibot");
-        setDefaultAppName("dashgo");
-        setMainWindowResource(R.layout.activity_control);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        showDialog(1);
-
+        setContentView(R.layout.activity_control);
         initView();
 
         initData();
 
+        registerBroadCast();
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        
-        switch (id){
-            case 1:
-                ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMessage("加载中..");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
-                return dialog;
-            default:
-            break;
-        }
-        
-        return super.onCreateDialog(id);
-    }
+    private void registerBroadCast() {
 
-    @Override
-    protected void init(NodeMainExecutor nodeMainExecutor) {
-        super.init(nodeMainExecutor);
+        IntentFilter filter=new IntentFilter(BluetoothLeService.CONNECTIONSTATEBROADCAST);
 
-        String name = Thread.currentThread().getName();
+        mReceiver = new MyReceive();
 
-        LogUtil.debugLog("localName:"+name);
-
-        nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
-
-        dashgoPublisher = new DashgoPublisher();
-
-        nodeMainExecutor.execute(dashgoPublisher, nodeConfiguration.setNodeName("eaibot/dashgo_demo"));
-
-        dashgoPublisher.setMaxLinearSpeed(mMaxLinearSpeed);
-
-        dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.0f);
-
-        mMediator = new Mediator(this,mMyiv_control);
-        dismissDialog(1);
+        registerReceiver(mReceiver,filter);
     }
 
     private void initData() {
+
 
         mBt_paramset.setOnClickListener(this);
 
         mBt_pidset.setOnClickListener(this);
 
-        mBt_back.setOnClickListener(this);
+        mIv_back.setOnClickListener(this);
 
         String maxspeed = SharePreferenceUtil.getSring(this, KEY_MAXLINEARSPEED);
         if (!TextUtils.isEmpty(maxspeed)){
@@ -167,19 +121,20 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
             }
         }
 
+        mMyiv_control.setListener(this);
+
+        mIv_back.setOnClickListener(this);
+
         mSb_linearspeed.setOnSeekBarChangeListener(this);
 
         mSb_anglespeed.setOnSeekBarChangeListener(this);
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BroadcastConstant.ROS_CLOSE_FINISHED);
-        intentFilter.addAction(BroadcastConstant.ROS_INIT_START);
-        registerReceiver(rosServiceBroadcastRceiver,intentFilter);
+        Intent intent = new Intent(this,BluetoothLeService.class);
+        bindService(intent,mConn,Context.BIND_AUTO_CREATE);
 
     }
 
     private void initView() {
-
         mBt_paramset = (Button) findViewById(R.id.bt_control_paramset);
 
         mBt_pidset = (Button) findViewById(R.id.bt_control_PIDset);
@@ -192,7 +147,7 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
         mSb_anglespeed = (SeekBar) findViewById(R.id.sb_control_anglespeed);
 
-        mBt_back = (ImageView) findViewById(R.id.iv_control_back);
+        mIv_back = (ImageView) findViewById(R.id.iv_control_back);
 
         mMyiv_control = (MyImageView) findViewById(R.id.myiv_control_control);
 
@@ -200,31 +155,14 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        
         switch (v.getId()){
-            case R.id.bt_control_paramset: {
-
-                Intent intent = new Intent(this, ParamSetActivity.class);
-
-                startActivity(intent);
-            }
-            break;
-            case R.id.bt_control_PIDset: {
-
-                Intent intent = new Intent(this, PIDSetActivity.class);
-
-                startActivity(intent);
-            }
-            break;
-            case R.id.iv_control_back: {
-
+            case R.id.iv_control_back:
                 finish();
-            }
-            break;
-
+                break;
             default:
-            break;
+                break;
         }
+
     }
 
     @Override
@@ -236,15 +174,15 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
                 mTv_linerspeed.setText("最大线速度 "+Float.parseFloat(mDecimalFormat.format(mMaxLinearSpeed))+"m/s");
 
-            break;
+                break;
             case R.id.sb_control_anglespeed:
                 mMaxAngleSpeed = 9 + progress*6.0f/100;
 
                 mTv_anglespeed.setText("最大角速度 "+ mDecimalFormat2.format(mMaxAngleSpeed)+"°/s");
-            break;
+                break;
 
             default:
-            break;
+                break;
         }
 
     }
@@ -267,10 +205,12 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
                 SharePreferenceUtil.putString(this, KEY_MAXLINEARSPEED, mDecimalFormat.format(mMaxLinearSpeed));
 
-                dashgoPublisher.setMaxLinearSpeed(mMaxLinearSpeed);
+                mBluetoothLeService.setMaxLinearSpeed(mMaxLinearSpeed);
+
+//                dashgoPublisher.setMaxLinearSpeed(mMaxLinearSpeed);
 
             }
-                break;
+            break;
             case R.id.sb_control_anglespeed:{
 
                 int progress = seekBar.getProgress();
@@ -281,18 +221,43 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
                 SharePreferenceUtil.putString(this,KEY_MAXANGLESPEED,mDecimalFormat2.format(mMaxAngleSpeed));
 
-                dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.f);
+                mBluetoothLeService.setMaxAngleSpeed(mMaxAngleSpeed);
+//                dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.f);
 
             }
             break;
             default:
-            break;
+                break;
         }
+    }
+
+    @Override
+    public void publishToRos() {
+
+        mBluetoothLeService.send(mMyiv_control.getLastDirection(),mMyiv_control.getSpeedRatio());
+
+    }
+
+    @Override
+    public void stopPublish() {
+        mBluetoothLeService.send(1,0);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(rosServiceBroadcastRceiver);
+        unregisterReceiver(mReceiver);
+        mBluetoothLeService.close();
+    }
+
+    private class MyReceive extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean connectstate = intent.getBooleanExtra("CONNECTSTATE",false);
+            if (!connectstate){
+                finish();
+            }
+        }
     }
 }

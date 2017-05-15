@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.jiadu.dudu.bluetooth.BluetoothConnectActivity;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button mBt_wifi;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initData() {
         mBt_wifi.setOnClickListener(this);
+        mBt_bluetooth.setOnClickListener(this);
     }
 
     private void initView() {
@@ -36,9 +39,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
 
-        Intent initent = new Intent(this,WifiConnectActivity.class);
+        switch (v.getId()){
+            case R.id.bt_wifi:{
+                Intent initent = new Intent(this,WifiConnectActivity.class);
+                startActivity(initent);
 
-        startActivity(initent);
+            }
+            break;
+            case R.id.bt_bluetooth:{
+                Intent initent = new Intent(this,BluetoothConnectActivity.class);
+                startActivity(initent);
+
+            }
+            break;
+
+            default:
+            break;
+        }
+
     }
 }
 
