@@ -42,8 +42,8 @@ public class BluetoothLeService extends Service{
         mMaxAngleSpeed = maxAngleSpeed;
     }
 
-    private float mMaxLinearSpeed = 0.f;
-    private float mMaxAngleSpeed = 0.f;
+    private float mMaxLinearSpeed = 2.f;
+    private float mMaxAngleSpeed = 12.f;
     private BluetoothGattCallback mCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -96,7 +96,8 @@ public class BluetoothLeService extends Service{
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            LogUtil.debugLog("onCharacteristicWrite 执行了");
+            LogUtil.debugLog("onCharacteristicWrite 执行了"+new String(characteristic.getValue()));
+
             super.onCharacteristicWrite(gatt, characteristic, status);
         }
 
@@ -256,20 +257,20 @@ public class BluetoothLeService extends Service{
         String a = "z ";
         switch (direction) {
             case 1://前进
-                a = a+((int) ratio*mMaxLinearSpeed*100)+" "+((int) ratio*mMaxLinearSpeed*100)+";";
+                a = a+ String.format("%2.1f",ratio*mMaxLinearSpeed*100)+" "+String.format("%2.1f",ratio*mMaxLinearSpeed*100)+";";
                 break;
             case 2://右转
-                a = a+ratio*mMaxAngleSpeed/3+" -"+ratio*mMaxAngleSpeed/3+";";
+                a = a+String.format("%2.1f",ratio*mMaxAngleSpeed/3*4)+" -"+String.format("%2.1f",ratio*mMaxAngleSpeed/3*4)+";";
 
                 break;
             case 3://后退
-                a = a+"-"+((int) ratio*mMaxLinearSpeed*100)+" -"+((int) ratio*mMaxLinearSpeed*100)+";";
+                a = a+"-"+String.format("%2.1f",ratio*mMaxLinearSpeed*100)+" -"+String.format("%2.1f",ratio*mMaxLinearSpeed*100)+";";
 
                 break;
             case 4://左转
-                a = a+"-"+ratio*mMaxAngleSpeed/3+" "+ratio*mMaxAngleSpeed/3+";";
-                break;
+                a = a+"-"+String.format("%2.1f",ratio*mMaxAngleSpeed/3*4)+" "+String.format("%2.1f",ratio*mMaxAngleSpeed/3*4)+";";
 
+                break;
             default:
                 break;
         }

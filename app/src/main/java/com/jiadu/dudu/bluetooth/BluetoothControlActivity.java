@@ -53,6 +53,10 @@ public class BluetoothControlActivity extends AppCompatActivity implements View.
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalService)service).getLocalService();
+
+            mBluetoothLeService.setMaxLinearSpeed(mMaxLinearSpeed);
+            mBluetoothLeService.setMaxAngleSpeed(mMaxAngleSpeed);
+
         }
 
         @Override
@@ -96,6 +100,11 @@ public class BluetoothControlActivity extends AppCompatActivity implements View.
                 mMaxLinearSpeed = Float.parseFloat(maxspeed);
                 mSb_linearspeed.setProgress((int) (1000*(mMaxLinearSpeed-0.1f)));
                 mTv_linerspeed.setText("最大线速度 "+mMaxLinearSpeed+"m/s");
+
+                if (mBluetoothLeService!=null){
+                    mBluetoothLeService.setMaxLinearSpeed(mMaxLinearSpeed);
+                }
+
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -116,12 +125,18 @@ public class BluetoothControlActivity extends AppCompatActivity implements View.
 
                 mTv_anglespeed.setText("最大角速度 "+ mMaxAngleSpeed +"°/s");
 
+                if (mBluetoothLeService!=null){
+                    mBluetoothLeService.setMaxAngleSpeed(mMaxAngleSpeed);
+                }
+
             }catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }
 
         mMyiv_control.setListener(this);
+
+        mMyiv_control.setInterval(100);
 
         mIv_back.setOnClickListener(this);
 

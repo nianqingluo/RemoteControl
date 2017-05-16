@@ -180,7 +180,7 @@ public class MyImageView extends ImageView {
                     }
                 };
 
-                mTimer.schedule(mTimerTask,0, INTERVAL);
+                mTimer.schedule(mTimerTask,0, mInterval);
             }
                 break;
             case MotionEvent.ACTION_MOVE:{
@@ -320,9 +320,6 @@ public class MyImageView extends ImageView {
      * @param interval 每次发送消息的时间间隔
      */
     public void setInterval(int interval) {
-        if (interval<=300){
-            mInterval = 300;
-        }
         mInterval = interval;
     }
 
