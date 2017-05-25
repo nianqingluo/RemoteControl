@@ -1,5 +1,6 @@
 package com.jiadu.dudu.bluetooth;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,10 +13,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +57,12 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
     private View mPb_scan;
     private TextView mTv_scaning;
     private BluetoothLeService mBluetoothLeService =null;
+    private final static int ACCESS_COARSE_LOCATION=0x333;
+    private final static int ACCESS_FINE_LOCATION=0x222;
+
+    private boolean isPermissiveFine = false;
+    private boolean isPermissiveCoarse = false;
+
     private ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -162,6 +173,36 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
     @Override
     protected void onResume() {
         super.onResume();
+        LogUtil.debugLog("SDK版本:"+Build.VERSION.SDK_INT);
+        if(Build.VERSION.SDK_INT >= 23){//判断当前系统的版本
+            int checkWriteStoragePermissionCoarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);//获取系统是否被授予该种权限
+            int checkWriteStoragePermissionFine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);//获取系统是否被授予该种权限
+
+            if(checkWriteStoragePermissionCoarse != PackageManager.PERMISSION_GRANTED){//如果没有被授予
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,},ACCESS_COARSE_LOCATION);
+            }
+            else {
+                isPermissiveCoarse = true;
+            }
+            if(checkWriteStoragePermissionFine != PackageManager.PERMISSION_GRANTED){//如果没有被授予
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,},ACCESS_FINE_LOCATION);
+            }else {
+                isPermissiveFine = true;
+            }
+
+            if (isPermissiveCoarse&&isPermissiveFine){
+
+                getScanerAndScan();
+            }
+        }else {
+            getScanerAndScan();
+        }
+    }
+
+    /**
+     * 获取leScaner
+     */
+    private void getScanerAndScan() {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -169,9 +210,35 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
             if (mBluetoothLeScanner==null){
                 mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
             }
-            LogUtil.debugLog("scanLeDevice(true)");
             scanLeDevice(true);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        LogUtil.debugLog("onRequestPermissionsResult执行了 "+permissions[0]);
+        switch (requestCode){
+            case ACCESS_COARSE_LOCATION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    isPermissiveCoarse =true;
+                }
+
+            break;
+            case ACCESS_FINE_LOCATION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    isPermissiveFine =true;
+                }
+
+            break;
+
+            default:
+            break;
+        }
+        if (isPermissiveCoarse&&isPermissiveFine){
+            getScanerAndScan();
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -221,7 +288,6 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
         } else {
             mScanning = false;
             mBluetoothLeScanner.stopScan(mCallback);
-            //            mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
         invalidateScan();
     }

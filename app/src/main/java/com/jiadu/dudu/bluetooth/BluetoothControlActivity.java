@@ -136,7 +136,7 @@ public class BluetoothControlActivity extends AppCompatActivity implements View.
 
         mMyiv_control.setListener(this);
 
-        mMyiv_control.setInterval(100);
+        mMyiv_control.setInterval(200);
 
         mIv_back.setOnClickListener(this);
 
