@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:textColor="#ffffff"
-            android:text="STOP"
+            android:text="重新扫描"
             android:textSize="17sp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -43,13 +43,14 @@
             android:clickable="true"
             />
 
-        <ProgressBar
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:id="@+id/pb_bluetoothconnect_scan"
-            android:layout_toLeftOf="@id/tv_bluetooth_scan"
+        <ImageView
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:id="@+id/iv_bluetoothconnect_scan"
+            android:layout_alignParentRight="true"
             android:layout_marginRight="5dp"
             android:layout_centerVertical="true"
+            android:src="@drawable/bluetooth_scaning"
             />
 
     </RelativeLayout>

@@ -1,12 +1,13 @@
 package com.jiadu.dudu;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -40,6 +41,8 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     private SeekBar mSb_linearspeed;
     private SeekBar mSb_anglespeed;
     private ImageView mBt_back;
+    private final static int LOADING = 1;
+    private final static int CONTENT = 2;
 
     private float mMaxLinearSpeed = 0.2f;
     private float mMaxAngleSpeed = 12.f;
@@ -48,6 +51,25 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
     private DecimalFormat mDecimalFormat=new DecimalFormat(".00");
     private DecimalFormat mDecimalFormat2=new DecimalFormat(".0");
+
+
+    private Handler mHander = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    synchronized (this){
+                        initFinished = true;
+                        toggleLoading(CONTENT);
+                    }
+                break;
+                default:
+                break;
+            }
+        }
+    };
+
 
     private BroadcastReceiver rosServiceBroadcastRceiver = new BroadcastReceiver() {
         @Override
@@ -63,6 +85,10 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     private NodeConfiguration nodeConfiguration;
 
     private DashgoPublisher dashgoPublisher;
+    private AnimationDrawable mAnimDrawable;
+    private View mRl_loading;
+    private View mRl_content;
+    private boolean initFinished = false;
 
     public DashgoPublisher getDashgoPublisher() {
         return dashgoPublisher;
@@ -81,29 +107,10 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         setMainWindowResource(R.layout.activity_control);
         super.onCreate(savedInstanceState);
 
-        showDialog(1);
-
         initView();
 
         initData();
 
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        
-        switch (id){
-            case 1:
-                ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMessage("加载中..");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(false);
-                return dialog;
-            default:
-            break;
-        }
-        
-        return super.onCreateDialog(id);
     }
 
     @Override
@@ -125,7 +132,9 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.0f);
 
         mMediator = new Mediator(this,mMyiv_control);
-        dismissDialog(1);
+//        dismissDialog(1);
+        mHander.sendEmptyMessage(1);
+
     }
 
     private void initData() {
@@ -135,7 +144,13 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         mBt_pidset.setOnClickListener(this);
 
         mBt_back.setOnClickListener(this);
-
+        
+        if (!initFinished){
+            synchronized (this){
+                toggleLoading(LOADING);
+            }
+        }
+        
         String maxspeed = SharePreferenceUtil.getSring(this, KEY_MAXLINEARSPEED);
         if (!TextUtils.isEmpty(maxspeed)){
             try {
@@ -171,11 +186,33 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
 
         mSb_anglespeed.setOnSeekBarChangeListener(this);
 
+        mMyiv_control.setInterval(200);
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BroadcastConstant.ROS_CLOSE_FINISHED);
         intentFilter.addAction(BroadcastConstant.ROS_INIT_START);
         registerReceiver(rosServiceBroadcastRceiver,intentFilter);
 
+    }
+
+    private void toggleLoading(int loading) {
+
+        switch (loading){
+            case LOADING:
+                mRl_content.setVisibility(View.GONE);
+                mRl_loading.setVisibility(View.VISIBLE);
+                mAnimDrawable.start();
+            break;
+            case CONTENT:
+                mRl_content.setVisibility(View.VISIBLE);
+                mRl_loading.setVisibility(View.GONE);
+                mAnimDrawable.stop();
+
+            break;
+
+            default:
+            break;
+        }
     }
 
     private void initView() {
@@ -195,6 +232,10 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
         mBt_back = (ImageView) findViewById(R.id.iv_control_back);
 
         mMyiv_control = (MyImageView) findViewById(R.id.myiv_control_control);
+
+        mRl_loading = findViewById(R.id.rl_wificontrol_loading);
+        mRl_content = findViewById(R.id.rl_wificontrol_content);
+        mAnimDrawable = (AnimationDrawable) findViewById(R.id.iv_wificontrol_loading).getBackground();
 
     }
 
@@ -278,9 +319,7 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
                 mMaxAngleSpeed = 9.0f+progress*6.0f/100;
 
                 mTv_anglespeed.setText("最大角速度 "+Float.parseFloat(mDecimalFormat2.format(mMaxAngleSpeed))+"°/s");
-
                 SharePreferenceUtil.putString(this,KEY_MAXANGLESPEED,mDecimalFormat2.format(mMaxAngleSpeed));
-
                 dashgoPublisher.setMaxAngularSpeed(mMaxAngleSpeed/20.f);
 
             }
@@ -294,5 +333,6 @@ public class ControlActivity extends RosAppActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(rosServiceBroadcastRceiver);
+        mAnimDrawable.stop();
     }
 }

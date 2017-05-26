@@ -1,8 +1,7 @@
 package com.jiadu.dudu;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +27,14 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
     private Button mBt_confirm;
     private EditText mEt_ip;
     private final String KEY_IP = "key_ip";
+    private View mRl_loading;
+    private AnimationDrawable mAnimDrawable;
+    private View mRl_content;
+
+    private static final int LOADING = 1;
+    private static final int CONTENT = 2;
+
+
 
 
     @Override
@@ -74,6 +81,11 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
 
         mEt_ip = (EditText) findViewById(R.id.et_wificonnect_ip);
 
+        mRl_loading = findViewById(R.id.rl_wificonnect_loading);
+
+        mRl_content = findViewById(R.id.rl_wificonnect_content);
+
+        mAnimDrawable = (AnimationDrawable) findViewById(R.id.iv_wificonnect_loading).getBackground();
     }
 
     @Override
@@ -103,18 +115,21 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
                 finish();
 */
 
-                showDialog(1);
+//                showDialog(1);
 
-                mEt_ip.setEnabled(false);
-                mBt_cancel.setEnabled(false);
-                mBt_confirm.setEnabled(false);
+                toggleLoading(LOADING);
+
+//                mEt_ip.setEnabled(false);
+//                mBt_cancel.setEnabled(false);
+//                mBt_confirm.setEnabled(false);
 
                 SharePreferenceUtil.putString(this,KEY_IP,mEt_ip.getText().toString());
 
                 new RosClient(this, mEt_ip.getText().toString().trim(), new OnTaskListener() {
                     @Override
                     public void onSuccess() {
-                        dismissDialog(1);
+
+                        toggleLoading(CONTENT);
 
                         Intent intent = new Intent(WifiConnectActivity.this, ControlActivity.class);
 
@@ -127,11 +142,8 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
                     public void onFailure(Exception e) {
 
                         Toast.makeText(WifiConnectActivity.this,"连接ros失败",Toast.LENGTH_SHORT).show();
-                        dismissDialog(1);
-
-                        mEt_ip.setEnabled(true);
-                        mBt_cancel.setEnabled(true);
-                        mBt_confirm.setEnabled(true);
+//                        dismissDialog(1);
+                        toggleLoading(CONTENT);
                     }
                 });
             break;
@@ -140,19 +152,36 @@ public class WifiConnectActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id){
-            case 1:
-                ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMessage("莫慌...");
-                dialog.setIndeterminate(true);
-                dialog.setCancelable(true);
-                return dialog;
-            default:
-                break;
-        }
+    private void toggleLoading(int toggle) {
+        switch (toggle){
+            case LOADING://显示loading画面
+                mRl_loading.setVisibility(View.VISIBLE);
+                mEt_ip.setEnabled(false);
+                mBt_cancel.setEnabled(false);
+                mBt_confirm.setEnabled(false);
 
-        return null;
+                mAnimDrawable.start();
+
+            break;
+            case CONTENT://显示内容画面
+                mRl_loading.setVisibility(View.GONE);
+                mEt_ip.setEnabled(true);
+                mBt_cancel.setEnabled(true);
+                mBt_confirm.setEnabled(true);
+
+                mAnimDrawable.stop();
+            break;
+
+            default:
+            break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mAnimDrawable!=null){
+            mAnimDrawable.stop();
+        }
     }
 }

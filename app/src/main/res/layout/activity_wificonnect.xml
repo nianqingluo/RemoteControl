@@ -1,121 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="@mipmap/bg01"
+              android:orientation="vertical"
             >
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-        <TextView
-            android:gravity="center"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@mipmap/dingbu"
-            android:textSize="17sp"
-            android:textColor="#ffffff"
-            android:text="ROS Master 连接"
-            />
-        <ImageView
-            android:id="@+id/iv_wificonnect_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:padding="0dp"
-            android:background="@drawable/selector_back_top"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:clickable="true"
-            />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:padding="0dp"
-            android:id="@+id/tv_masterip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:text="Master IP"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="22dp"
-            android:textColor="#ffffff"
-            />
-
-        <EditText
-            android:id="@+id/et_wificonnect_ip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_masterip"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:textColor="#ffff00"
-            android:textSize="16sp"
-            android:text="192.168.88.101"
-            android:textCursorDrawable="@null"
-            android:background="#00000000"
-            />
-        <Button
-            android:id="@+id/bt_wificonnect_delete"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:background="@drawable/selector_delete"
-            android:layout_alignRight="@id/et_wificonnect_ip"
-            android:layout_alignTop="@id/et_wificonnect_ip"
-
-            />
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/et_wificonnect_ip"
-            android:layout_alignLeft="@id/et_wificonnect_ip"
-            android:layout_alignRight="@id/et_wificonnect_ip"
-            android:src="@mipmap/xian"
-            android:scaleType="fitXY"
-            android:layout_marginTop="10dp"
-            />
-
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="40dp"
-            android:layout_centerHorizontal="true"
-
             >
-            <Button
-                android:layout_width="158dp"
-                android:layout_height="40dp"
-                android:background="@drawable/selector_connect_cancel"
-                android:id="@+id/bt_wificonnect_cancel"
-                android:layout_marginRight="8dp"
-                />
 
-            <Button
-                android:id="@+id/bt_wificonnect_confirm"
-                android:text="确定"
+            <TextView
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/dingbu"
+                android:textSize="17sp"
                 android:textColor="#ffffff"
-                android:textSize="16sp"
-                android:layout_width="158dp"
-                android:layout_height="40dp"
-                android:background="@drawable/selector_connect_confirm"
-                android:layout_marginLeft="8dp"
+                android:text="ROS Master 连接"
                 />
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/iv_wificonnect_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="0dp"
+                android:background="@drawable/selector_back_top"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:clickable="true"
+                />
+        </RelativeLayout>
 
-    </RelativeLayout>
-    
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rl_wificonnect_loading"
+                android:visibility="gone"
+                >
+                <ImageView
+                    android:layout_centerInParent="true"
+                    android:layout_width="107dp"
+                    android:layout_height="141dp"
+                    android:id="@+id/iv_wificonnect_loading"
+                    android:background="@drawable/alertanim"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:id="@+id/rl_wificonnect_content"
+                >
+
+                <TextView
+                    android:padding="0dp"
+                    android:id="@+id/tv_masterip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="Master IP"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="22dp"
+                    android:textColor="#ffffff"
+                    />
+
+                <EditText
+                    android:id="@+id/et_wificonnect_ip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_masterip"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:textColor="#ffff00"
+                    android:textSize="16sp"
+                    android:text="192.168.88.101"
+                    android:textCursorDrawable="@null"
+                    android:background="#00000000"
+                    />
+
+                <Button
+                    android:id="@+id/bt_wificonnect_delete"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/selector_delete"
+                    android:layout_alignRight="@id/et_wificonnect_ip"
+                    android:layout_alignTop="@id/et_wificonnect_ip"
+
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/et_wificonnect_ip"
+                    android:layout_alignLeft="@id/et_wificonnect_ip"
+                    android:layout_alignRight="@id/et_wificonnect_ip"
+                    android:src="@mipmap/xian"
+                    android:scaleType="fitXY"
+                    android:layout_marginTop="10dp"
+                    />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="40dp"
+                    android:layout_centerHorizontal="true"
+
+                    >
+
+                    <Button
+                        android:layout_width="158dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/selector_connect_cancel"
+                        android:id="@+id/bt_wificonnect_cancel"
+                        android:layout_marginRight="8dp"
+                        />
+
+                    <Button
+                        android:id="@+id/bt_wificonnect_confirm"
+                        android:text="确定"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp"
+                        android:layout_width="158dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/selector_connect_confirm"
+                        android:layout_marginLeft="8dp"
+                        />
+
+                </LinearLayout>
+            </RelativeLayout>
+
+        </RelativeLayout>
+
 </LinearLayout>

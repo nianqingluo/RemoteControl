@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.jiadu.dudu.R;
 import com.jiadu.util.LogUtil;
+import com.jiadu.util.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
     private final int SCAN_PERIOD = 10000;         //扫描wifi时间
     private MyBaseAdapter mBaseAdapter;
     private ImageView mIv_bluetoothconnect_back;
-    private View mPb_scan;
+    private ImageView mIv_scan;
     private TextView mTv_scaning;
     private BluetoothLeService mBluetoothLeService =null;
     private final static int ACCESS_COARSE_LOCATION=0x333;
@@ -127,6 +128,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
                 }
 
                 mBaseAdapter.notifyDataSetChanged();
+
                 super.onScanResult(callbackType, result);
             }
 
@@ -164,7 +166,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
 
         mIv_bluetoothconnect_back = (ImageView) findViewById(R.id.iv_bluetoothconnect_back);
 
-        mPb_scan = findViewById(R.id.pb_bluetoothconnect_scan);
+        mIv_scan = (ImageView) findViewById(R.id.iv_bluetoothconnect_scan);
 
         mTv_scaning = (TextView) findViewById(R.id.tv_bluetooth_scan);
 
@@ -273,8 +275,13 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
                 @Override
                 public void run() {
                     mScanning = false;
-
                     mBluetoothLeScanner.stopScan(mCallback);
+
+                    if (mListScanResults.size()==0){
+
+                        ToastUtils.makeToast(BluetoothConnectActivity.this,"附近无可用蓝牙设备");
+                    }
+
                     invalidateScan();
                 }
             }, SCAN_PERIOD);
@@ -295,11 +302,11 @@ public class BluetoothConnectActivity extends AppCompatActivity implements View.
     private void invalidateScan() {
 
         if (mScanning){
-            mTv_scaning.setText("STOP");
-            mPb_scan.setVisibility(View.VISIBLE);
+            mTv_scaning.setVisibility(View.GONE);
+            mIv_scan.setVisibility(View.VISIBLE);
         }else {
-            mTv_scaning.setText("SCANING");
-            mPb_scan.setVisibility(View.GONE);
+            mTv_scaning.setVisibility(View.GONE);
+            mIv_scan.setVisibility(View.GONE);
         }
     }
 
